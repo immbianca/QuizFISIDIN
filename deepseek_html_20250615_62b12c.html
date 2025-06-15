@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz FIS - Fundamentele Inginieriei Software</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-around;
+            color: white;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .quiz-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .question-number {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            color: #2c3e50;
+        }
+
+        .options {
+            list-style: none;
+        }
+
+        .option {
+            margin-bottom: 12px;
+            padding: 15px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .option.correct {
+            border-color: #27ae60;
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .option.incorrect {
+            border-color: #e74c3c;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+        }
+
+        .result-summary {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .score {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .mode-selector {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .mode-btn {
+            margin: 10px;
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid transparent;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn:hover, .mode-btn.active {
+            background: white;
+            color: #667eea;
+            border-color: white;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Quiz FIS</h1>
+            <p>Fundamentele Inginieriei Software</p>
+        </div>
+
+        <div class="mode-selector" id="modeSelector">
+            <h3 style="color: white; margin-bottom: 20px;">Alege modul de quiz:</h3>
+            <button class="mode-btn active" onclick="setMode('practice', this)">Mod Practică</button>
+            <button class="mode-btn" onclick="setMode('exam', this)">Mod Examen</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-number" id="totalQuestions">81</span>
+                <span>Total întrebări</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="currentQuestion">1</span>
+                <span>Întrebarea curentă</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="correctAnswers">0</span>
+                <span>Răspunsuri corecte</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="accuracy">0%</span>
+                <span>Acuratețe</span>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="quiz-card" id="quizCard">
+            <div class="question-number" id="questionNumber">1</div>
+            <div class="question" id="questionText"></div>
+            <ul class="options" id="optionsList"></ul>
+            <div class="controls">
+                <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()">← Anterior</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Următorul →</button>
+                <button class="btn btn-success" id="finishBtn" onclick="finishQuiz()" style="display: none;">Finalizează Quiz</button>
+            </div>
+        </div>
+
+        <div class="result-summary" id="resultSummary" style="display: none;">
+            <div class="score" id="finalScore"></div>
+            <h3 id="resultMessage"></h3>
+            <p id="resultDetails"></p>
+            <button class="btn btn-primary" onclick="restartQuiz()" style="margin-top: 20px;">Reîncepe Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "La angajarea unui programator pentru un proiect estimat la 3 luni, cel mai important factor de luat în calcul este:",
+                options: ["Educația", "Abilitățile comunicaționale", "Experiența în limbajul de programare"],
+                correct: 2
+            },
+            {
+                question: "Care factor influențează decizia de creștere a prețului unui sistem la încheierea unui contract:",
+                options: ["Oportunitățile de piață", "Imprecia estimării costurilor", "Situația financiară dificilă"],
+                correct: 1
+            },
+            {
+                question: "Care este cea mai probabilă cauză de degradare a performanței unui sistem organizat după un model pe nivele (mașina abstractă)?",
+                options: ["Nivelele superioare pot depinde direct de servicii oferite de nivelele de mai jos"],
+                correct: 0
+            },
+            {
+                question: "Subsistemele unui sistem distribuit, organizat după un model cu zona de date partajată, pot schimba date prin:",
+                options: ["O bază de date centrală accesibilă tuturor subsistemelor"],
+                correct: 0
+            },
+            {
+                question: "În cazul Extreme Programming testarea de la început presupune:",
+                options: ["Selectarea prioritară a setului minimal de funcționalități esențiale", "Scrierea testelor pentru funcționalități înainte de implementarea respectivelor funcționalități", "Limitarea proiectării la suportul cerințelor curente"],
+                correct: 1
+            },
+            {
+                question: "Lista de inspecție reprezintă:",
+                options: ["Lista cu erori frecvente în limbajul de implementare ales", "Lista de materiale necesare procesului de inspecție", "Lista programatorilor implicați în procesul de inspecție"],
+                correct: 0
+            },
+            {
+                question: "Constrângerile unui sistem reprezintă cerințe:",
+                options: ["Non-funcționale"],
+                correct: 0
+            },
+            {
+                question: "Cui NU îi sunt folositoare cerințele sistem rezultate în urma analizei cerințelor:",
+                options: ["Managerilor de contracte", "Proiectanților de sistem", "Programatorilor"],
+                correct: 0
+            },
+            {
+                question: "Care sunt elementele de modelare dintr-o diagramă entitate-relație:",
+                options: ["Entități, relații și atribute"],
+                correct: 0
+            },
+            {
+                question: "Procesul de analiză NU poate depista:",
+                options: ["Timpul de execuție a unei funcții statice"],
+                correct: 0
+            },
+            {
+                question: "Care din următoarele caracteristici NU reprezintă un avantaj al modelelor în cascadă?",
+                options: ["Modificarea cerințelor este ușor de gestionat", "Fazele și procesele sunt terminate una după alta", "Modelul este simplu de utilizat"],
+                correct: 0
+            },
+            {
+                question: "Care din următoarele afirmații privind fazele de dezvoltare a unui produs software este adevărată:",
+                options: ["Testarea și validarea se aplică la toate fazele de dezvoltare a unui sistem software"],
+                correct: 0
+            },
+            {
+                question: "La modelul în V planificarea integrării sistemului se face în faza de:",
+                options: ["Integrare componente și testare", "Analiză cerințe sistem", "Proiectare la nivel înalt"],
+                correct: 1
+            },
+            {
+                question: "La diagramele Use-Case legătura dintre un actor și un use-case poate fi de tip:",
+                options: ["Comunicare"],
+                correct: 0
+            },
+            {
+                question: "La un ciclu de viață iterativ, prin creșteri succesive (increments) se înțelege:",
+                options: ["Versiuni noi ale produsului la sfârșitul fiecărei iterații"],
+                correct: 0
+            },
+            {
+                question: "Care este diferența principală între ingineria software și ramurile inginereşti tradiționale?",
+                options: ["Permite modificarea drastică a cerințelor în timpul dezvoltării"],
+                correct: 0
+            },
+            {
+                question: "Diagrama de context este o reprezentare din cadrul unei diagrame:",
+                options: ["Entitate-relație (ER)", "De flux de date", "De utilizare (use case)"],
+                correct: 1
+            },
+            {
+                question: "La estimarea costului unui sistem software cel mai important factor în majoritatea cazurilor este:",
+                options: ["Costul efortului personalului"],
+                correct: 0
+            },
+            {
+                question: "Care din următoarele caracteristici reprezintă un dezavantaj pentru modelul de organizare cu zona de date partajată?",
+                options: ["Îngreunează implementarea unor politici de gestiune specifice fiecărui subsistem"],
+                correct: 0
+            },
+            {
+                question: "Care din următorii pași ai analizei statice nu detectează direct anomaliile în cod:",
+                options: ["Analiza căilor de rulare"],
+                correct: 0
+            },
+            {
+                question: "Procesul de validare la dezvoltarea unui produs software trebuie să răspundă la următoarea întrebare:",
+                options: ["Construim produsul care trebuie?"],
+                correct: 0
+            },
+            {
+                question: "Localizarea și înlăturarea unei erori se face în procesul de:",
+                options: ["Depanare"],
+                correct: 0
+            },
+            {
+                question: "Verificarea statică înseamnă:",
+                options: ["Inspectarea codului"],
+                correct: 0
+            },
+            {
+                question: "Care dintre următoarele afirmații reprezintă un dezavantaj pentru Modelul Obiectual de descompunere a unui sistem?",
+                options: ["Necesitatea de a schimba interfața unui obiect poate duce ușor la necesitatea de a modifica alte obiecte cu care acesta este cuplat"],
+                correct: 0
+            },
+            {
+                question: "Datorită coruperii frecvente a structurii sistemului dezvoltarea incrementală poate genera probleme de:",
+                options: ["Mentenanță"],
+                correct: 0
+            },
+            {
+                question: "Prototipurile sistemelor software se pot utiliza pentru implementarea testelor:",
+                options: ["Back to back"],
+                correct: 0
+            },
+            {
+                question: "Care din următoarele caracteristici ale unui sistem organizat după un model client-server reprezintă un avantaj important?",
+                options: ["Este ușor de adăugat noi servere"],
+                correct: 0
+            },
+            {
+                question: "Care tip de model arhitectural evidențiază componentele majore ale unui sistem?",
+                options: ["Model structural"],
+                correct: 0
+            },
+            {
+                question: "Cumulative Class Dependency (CCD) se folosește pentru:",
+                options: ["Complexitatea unui sistem format din componente"],
+                correct: 0
+            },
+            {
+                question: "La testarea top-down se folosesc componente de tip:",
+                options: ["Stub"],
+                correct: 0
+            },
+            {
+                question: "Abstractizarea prin modelare se aplică:",
+                options: ["Și produselor și proceselor software"],
+                correct: 0
+            },
+            {
+                question: "Care din următoarele întrebări sunt utile la proiectarea unui sistem:",
+                options: ["Care este strategia de control cea mai potrivită?"],
+                correct: 0
+            },
+            {
+                question: "La un ciclu de viață în cascadă cu reacție faza de integrare urmează după faza de:",
+                options: ["Proiectare", "Analiza cerințelor", "Operare", "Implementare"],
+                correct: 3
+            },
+            {
+                question: "Care dintre următoarele afirmații NU constituie un avantaj al programării în perechi practicată în Extreme Programming:",
+                options: ["Programarea în perechi evită dezvoltarea prea rapidă a codului, permițând sincronizarea"],
+                correct: 0
+            },
+            {
+                question: "Care din următoarele denumiri NU se referă la un stil de organizare a unui sistem?",
+                options: ["Stil automat finit cu legături ciclice"],
+                correct: 0
+            },
+            {
+                question: "Care din următoarele afirmații relevă problema în reutilizarea unor componente software:",
+                options: ["Prin reutilizare crește costul de mentenanță"],
+                correct: 0
+            },
+            {
+                question: "Ce rezolvă mentenanța perfective a unui sistem software?",
+                options: ["Implementează noi cerințe funcționale sau non-funcționale după începerea operării sistemului", "Adaptează funcționarea sistemului pentru platforma clientului după instalarea acestuia", "Înlătură defecte de proiectare a sistemului după începerea operării acestuia de către client"],
+                correct: 0
+            },
+            {
+                question: "Care sunt tipurile de diagrame UML de interacțiune (Interaction)?",
+                options: ["Secvență și Colaborare (Sequence and Collaboration)"],
+                correct: 0
+            },
+            {
+                question: "O diagramă UML de clase modelează:",
+                options: ["Clasificarea unui sistem", "Structura unui sistem", "Comportamentul unui sistem"],
+                correct: 1
+            },
+            {
+                question: "O componentă tip driver este utilizată la testare pentru:",
+                options: ["A trimite datele și contextul în locul unei componente neimplementate încă"],
+                correct: 0
+            },
+            {
+                question: "Cerințele utilizator sunt complete dacă:",
+                options: ["Includ descrieri pentru toate facilitățile cerute de client"],
+                correct: 0
+            },
+            {
+                question: "Dacă la o diagramă Use-Case un caz de utilizare depinde necondiționat de realizarea unui alt caz, relația dintre ele este de:",
+                options: ["Extindere", "Incluziune"],
+                correct: 1
+            },
+            {
+                question: "Care din următorii pași NU reprezintă o fază de dezvoltare a unui sistem Software:",
+                options: ["Ajustarea și adaptarea"],
+                correct: 0
+            },
+            {
+                question: "Controlul calității cerințelor rezultate din faza de analiză a cerințelor va verifica ca acestea să fie:",
+                options: ["Consistente", "Evazive", "Imposibil de modificat", "Robuste la intrări perturbate"],
+                correct: 0
+            },
+            {
+                question: "Prin ce tip de diagramă UML se poate reprezenta un algoritm de calcul:",
+                options: ["Diagrama de clase (Class)", "Diagrama de cazuri de utilizare (Use-case)", "Diagrama de activitate (Activity)", "Diagrama de secvență (Sequence)"],
+                correct: 2
+            },
+            {
+                question: "La sistemele software formate din componente (distribuite) complexitatea este dată în principal de:",
+                options: ["Numărul de legături directe și de comunicații între componente", "Numărul de variabile utilizate", "Numărul de instrucțiuni ciclice folosite", "Numărul de linii de cod"],
+                correct: 0
+            },
+            {
+                question: "Care din următoarele cerințe NU reprezintă o cerință non-funcțională:",
+                options: ["Sistemul trebuie implementat în limbajul Java", "Sistemul trebuie să ignore valorile negative introduse de utilizator", "Sistemul trebuie să proceseze cel puțin 10 intrări pe secundă", "Intervalul minim între 2 erori ale sistemului trebuie să fie de 5 luni"],
+                correct: 1
+            },
+            {
+                question: "Sistemele OLTP se folosesc într-o companie la:",
+                options: ["Managementul tactic", "Managementul operațional", "Managementul teoretic", "Managementul strategic"],
+                correct: 1
+            },
+            {
+                question: "Prin testare software se poate:",
+                options: ["Evidenția îndeplinirea cerințelor non-funcționale", "Evidenția lipsa erorilor", "Evidenția prezența erorilor"],
+                correct: 2
+            },
+            {
+                question: "Rețelele CPM se folosesc la:",
+                options: ["Generarea automată a codului", "Proiectarea de nivel înalt", "Planificarea proiectului"],
+                correct: 2
+            },
+            {
+                question: "Care dintre următoarele nu este o caracteristică a unui sistem de luat în calcul la proiectare:",
+                options: ["Empatia"],
+                correct: 0
+            },
+            {
+                question: "Utilizarea la proiectarea unui sistem a unor componente de mici dimensiuni (fine) sprijinî:",
+                options: ["Mentenabilitatea", "Securitatea", "Disponibilitatea"],
+                correct: 0
+            },
+            {
+                question: "În cazul unui stil de control centralizat care model este aplicabil sistemelor concurente:",
+                options: ["Modelul \"gestionar\""],
+                correct: 0
+            },
+            {
+                question: "Modelele arhitecturale de referință sunt de obicei de tip:",
+                options: ["Top-down"],
+                correct: 0
+            },
+            {
+                question: "Cerințele legate de portabilitatea unui sistem se pot cuantifica prin:",
+                options: ["Specificarea timpului de răspuns al sistemului în milisecunde", "Specificarea încărcării maxime a procesorului pe un anumit interval, în procente", "Specificarea unui procent de linii de cod dependente de un anumit limbaj"],
+                correct: 2
+            },
+            {
+                question: "Care dintre următoarele afirmații reprezintă beneficii ale reutilizării în dezvoltarea software:",
+                options: ["Prin refolosirea unei componente se micșorează timpul de implementare și testare a sistemului"],
+                correct: 0
+            },
+            {
+                question: "Reutilizarea software prin reconfigurarea unui sistem generic este cunoscută ca și:",
+                options: ["Configurable vertical applications"],
+                correct: 0
+            },
+            {
+                question: "Care din următoarele afirmații reprezintă un dezavantaj major al modelului broadcast:",
+                options: ["Subsistemele nu știu dacă și când un eveniment este tratat de alte subsisteme"],
+                correct: 0
+            },
+            {
+                question: "Modelul pipeline de descompunere a unui sistem îngreunează:",
+                options: ["Implementarea interacțiunii bazate pe evenimente"],
+                correct: 0
+            },
+            {
+                question: "Care din următoarele afirmații nu reprezintă o problemă a tehnicii RAD de programare vizuală:",
+                options: ["Lipsa suportului pentru dezvoltarea orientată pe sine"],
+                correct: 0
+            },
+            {
+                question: "Care din următoarele afirmații nu reprezintă un principiu al metodelor Agile:",
+                options: ["Accentul pus pe cod, nu pe programatori"],
+                correct: 0
+            },
+            {
+                question: "Care din următoarele componente nu este specifică unui mediu RAD:",
+                options: ["Generator de probleme"],
+                correct: 0
+            },
+            {
+                question: "Pentru a crește disponibilitatea unui sistem este importantă:",
+                options: ["Includerea de componente redundante"],
+                correct: 0
+            },
+            {
+                question: "La un ciclu de viață în cascadă cu suprapuneri faza de analiză a cerințelor se suprapune cu faza de:",
+                options: ["Integrare", "Proiectare", "Implementare", "Operare"],
+                correct: 1
+            },
+            {
+                question: "Avantajul principal al modelului de control bazat pe întreruperi:",
+                options: ["Sistemul este dificil de validat", "Se bazează pe definirea unei rutine de tratare pentru fiecare întrerupere", "Permite un răspuns rapid la evenimente", "Sistemul este complex de programat"],
+                correct: 2
+            },
+            {
+                question: "Grupul de practici reunite sub denumirea „Practici comune echipei la Extreme Programming NU include:",
+                options: ["Programarea în perechi", "Proiectarea simplă", "Codarea standard", "Folosirea unor denumiri explicite"],
+                correct: 0
+            },
+            {
+                question: "Ce model al ciclului de viață sprijină cel mai bine dezvoltarea orientată pe obiecte?",
+                options: ["Modelul iterativ cu variante succesive", "Modelul în cascadă cu reacție"],
+                correct: 0
+            },
+            {
+                question: "Specificarea de către client a unei dimensiuni maxime de stocare pe disc pentru sistem constituie o:",
+                options: ["Cerință de colaborare", "Cerință funcțională", "Cerință non-funcțională", "Cerință de domeniu"],
+                correct: 2
+            },
+            {
+                question: "La Extreme Programming refactorizarea este inclusă în grupul de practici:",
+                options: ["Cadru adecvat pentru programator", "Practici comune echipei", "Reacție fină", "Proces continuu"],
+                correct: 3
+            },
+            {
+                question: "Care din următoarele observații cu privire la sistemele software nu este adevărată?",
+                options: ["O structură este stabilă dacă...", "Doar ce este ascuns...", "Un sistem este puternic dacă nu permite mentenanță"],
+                correct: 2
+            },
+            {
+                question: "Care este etapa înaintea luării deciziei în Modelul Spirală:",
+                options: ["Evaluarea riscului"],
+                correct: 0
+            },
+            {
+                question: "Care afirmație e corectă:",
+                options: ["Sistemul software dezvoltat pentru o companie face parte din sistemul informatic"],
+                correct: 0
+            },
+            {
+                question: "Care NU este o proprietate a managementului personal:",
+                options: ["Excluderea"],
+                correct: 0
+            },
+            {
+                question: "Care NU este o problemă a mediului RAD:",
+                options: ["Lipsa orientenii spre OOP"],
+                correct: 0
+            },
+            {
+                question: "Pe ce tip de descompunere se bazează modelarea structurată?",
+                options: ["Descompunere funcțională", "Descompunere transversală", "Descompunere structurată", "Descompunere propozițională"],
+                correct: 0
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let selectedAnswers = Array(questions.length).fill(undefined);
+        let correctCount = 0;
+        let quizMode = 'practice';
+        let quizCompleted = false;
+
+        function setMode(mode, element) {
+            quizMode = mode;
+            
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            element.classList.add('active');
+            
+            restartQuiz();
+            document.getElementById('modeSelector').style.display = 'none';
+        }
+
+        function loadQuestion() {
+            const question = questions[currentQuestionIndex];
+            
+            document.getElementById('questionNumber').textContent = currentQuestionIndex + 1;
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            
+            const optionsList = document.getElementById('optionsList');
+            optionsList.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const li = document.createElement('li');
+                li.className = 'option';
+                li.textContent = option;
+                li.onclick = () => selectOption(index);
+                
+                if (selectedAnswers[currentQuestionIndex] === index) {
+                    li.classList.add('selected');
+                    
+                    if (quizMode === 'practice') {
+                        if (index === question.correct) {
+                            li.classList.add('correct');
+                        } else {
+                            li.classList.add('incorrect');
+                        }
+                    }
+                }
+                
+                optionsList.appendChild(li);
+            });
+            
+            if (quizMode === 'practice' && selectedAnswers[currentQuestionIndex] !== undefined) {
+                const correctOption = document.querySelectorAll('.option')[question.correct];
+                correctOption.classList.add('correct');
+            }
+            
+            updateProgress();
+            updateControls();
+            updateStats();
+        }
+
+        function selectOption(index) {
+            if (quizCompleted) return;
+            if (quizMode === 'exam' && selectedAnswers[currentQuestionIndex] !== undefined) {
+                return;
+            }
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            selectedAnswers[currentQuestionIndex] = index;
+            const optionElement = document.querySelectorAll('.option')[index];
+            optionElement.classList.add('selected');
+            
+            if (quizMode === 'practice') {
+                const question = questions[currentQuestionIndex];
+                if (index === question.correct) {
+                    optionElement.classList.add('correct');
+                } else {
+                    optionElement.classList.add('incorrect');
+                    const correctOption = document.querySelectorAll('.option')[question.correct];
+                    correctOption.classList.add('correct');
+                }
+            }
+            
+            updateStats();
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function updateControls() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const finishBtn = document.getElementById('finishBtn');
+            
+            prevBtn.style.display = currentQuestionIndex === 0 ? 'none' : 'inline-block';
+            
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.style.display = 'none';
+                finishBtn.style.display = 'inline-block';
+            } else {
+                nextBtn.style.display = 'inline-block';
+                finishBtn.style.display = 'none';
+            }
+        }
+
+        function updateStats() {
+            correctCount = 0;
+            for (let i = 0; i < questions.length; i++) {
+                if (selectedAnswers[i] !== undefined && selectedAnswers[i] === questions[i].correct) {
+                    correctCount++;
+                }
+            }
+            
+            document.getElementById('correctAnswers').textContent = correctCount;
+            
+            const answered = selectedAnswers.filter(answer => answer !== undefined).length;
+            const accuracy = answered > 0 ? Math.round((correctCount / answered) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+        }
+
+        function finishQuiz() {
+            const unanswered = selectedAnswers.filter(a => a === undefined).length;
+            if (unanswered > 0 && quizMode === 'exam') {
+                if (!confirm(`${unanswered} întrebări nu au răspuns. Sigur doriți să finalizați?`)) {
+                    return;
+                }
+            }
+            
+            quizCompleted = true;
+            const finalScore = Math.round((correctCount / questions.length) * 100);
+            
+            document.getElementById('quizCard').style.display = 'none';
+            document.getElementById('resultSummary').style.display = 'block';
+            
+            document.getElementById('finalScore').textContent = finalScore + '%';
+            
+            let message = '';
+            let details = '';
+            
+            if (finalScore >= 90) {
+                message = 'Excelent! 🎉';
+                details = 'Ai o înțelegere foarte bună a conceptelor FIS!';
+            } else if (finalScore >= 75) {
+                message = 'Foarte bine! 👏';
+                details = 'Performanță solidă, continuă să exersezi!';
+            } else if (finalScore >= 60) {
+                message = 'Bine! 👍';
+                details = 'Rezultat decent, mai ai de lucrat la unele concepte.';
+            } else {
+                message = 'Trebuie să mai exersezi 📚';
+                details = 'Recomand să revezi materialul și să reiei quiz-ul.';
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+            document.getElementById('resultDetails').textContent = 
+                `${details} Ai răspuns corect la ${correctCount} din ${questions.length} întrebări.`;
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            selectedAnswers = Array(questions.length).fill(undefined);
+            correctCount = 0;
+            quizCompleted = false;
+            
+            document.getElementById('quizCard').style.display = 'block';
+            document.getElementById('resultSummary').style.display = 'none';
+            document.getElementById('modeSelector').style.display = 'block';
+            
+            loadQuestion();
+            updateStats();
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (quizCompleted) return;
+            
+            if (e.key === 'ArrowLeft' && currentQuestionIndex > 0) {
+                previousQuestion();
+            } else if (e.key === 'ArrowRight' && currentQuestionIndex < questions.length - 1) {
+                nextQuestion();
+            } else if (e.key >= '1' && e.key <= '9') {
+                const optionIndex = parseInt(e.key) - 1;
+                const options = document.querySelectorAll('.option');
+                if (options[optionIndex]) {
+                    selectOption(optionIndex);
+                }
+            }
+        });
+
+        // Initialize quiz
+        document.getElementById('totalQuestions').textContent = questions.length;
+        loadQuestion();
+    </script>
+</body>
+</html>
